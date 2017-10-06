@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorSlide2">
+
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/cloudcomputing"
+        android:scaleType="centerCrop"
+        android:id="@+id/img1"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv1Slide1"
+        android:text="SINCRONIZZAZIONE"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="23sp"
+        android:layout_below="@+id/img1"
+        android:layout_marginTop="17dp"
+        android:layout_centerHorizontal="true" />
+    <TextView
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="Applicando qui le tue modifiche,
+esse verranno automaticamente
+sincronizzate sul cloud"
+        android:textSize="18sp"
+        android:id="@+id/tv2Slide2"
+        android:textColor="#ffffff"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="13dp"
+        android:layout_below="@+id/tv1Slide1"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

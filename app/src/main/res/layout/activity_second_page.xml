@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.giulia.floatingactionbutton.SecondPage">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView0"
+        android:background="@color/inactiveDots"
+        android:textColor="@android:color/white"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView1"
+        android:layout_marginTop="30dp"
+
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView11"
+        android:layout_marginTop="100dp"/>
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/listView1"
+    android:layout_marginTop="130dp"
+        >
+
+    </ListView>
+
+ <com.getbase.floatingactionbutton.FloatingActionsMenu
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:id="@+id/menu"
+     android:layout_margin="16dp"
+     android:layout_alignParentBottom="true"
+     android:layout_alignParentRight="true"
+     android:layout_alignParentEnd="true"
+     app:fab_addButtonColorNormal="#FFFF3D0C"
+     app:fab_labelStyle="@style/menu_label_style"
+
+     >
+     <com.getbase.floatingactionbutton.FloatingActionButton
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:id="@+id/addfolder"
+         app:fab_icon="@drawable/ic_folder_white"
+         app:fab_colorNormal="#ffcd38"
+         app:fab_size="mini"
+         app:fab_title="Aggiungi cartella"
+
+         />
+     <com.getbase.floatingactionbutton.FloatingActionButton
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:id="@+id/addfile"
+         app:fab_icon="@drawable/ic_file_white"
+         app:fab_colorNormal="#0caeff"
+         app:fab_size="mini"
+         app:fab_title="Aggiungi file"
+
+         />
+
+</com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+</RelativeLayout>

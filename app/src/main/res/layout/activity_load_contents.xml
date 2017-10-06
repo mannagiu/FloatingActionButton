@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#605b5b"
+    tools:context="com.giulia.floatingactionbutton.LoadContents">
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/home"
+        android:scaleType="centerCrop"
+        android:id="@+id/img1"
+        android:layout_marginBottom="171dp"
+        android:layout_above="@+id/bnSkip"
+        android:layout_centerHorizontal="true" />
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:id="@+id/dotLayout"
+android:layout_centerHorizontal="true"
+android:layout_alignParentBottom="true"
+android:orientation="horizontal"
+android:gravity="center"
+android:layout_marginBottom="55sp"
+android:background="#ffffff"
+
+
+    />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="START"
+        android:textSize="16sp"
+        android:onClick="loadFirstPage"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="@null"
+        android:id="@+id/bnNext"
+        android:layout_marginBottom="8dp"
+
+        android:textColor="#ffffff"
+        />
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="loadSlides"
+        android:text="Mostra intro slides"
+        android:textSize="16sp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@null"
+        android:id="@+id/bnSkip"
+        android:layout_marginBottom="8dp"
+
+        android:textColor="#ffffff"
+        />
+
+    
+
+</RelativeLayout>

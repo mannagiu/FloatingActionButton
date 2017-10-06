@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FloatingActionButton</string>
+    <string name="Slide_1_title">Benvenuto su Myapp</string>
+    <string name="Slide_2_title">Applicando qui le tue modifiche, automaticamente verranno sincronizzate sul cloud </string>
+    <string name="Slide_4_desc">Per cominciare clicca sul menù in alto a destra e scegli a quale cloud storage connetterti</string>
+    <string name="my_preference">"com.giulia.com.MyPref</string>
+    <string name="my_preference_key">"com.giulia.com.MyPrefKey"</string>
+    <string name="slide1_desc">MyApp ti permette di visualizzare e modificare la struttura delle cartelle e dei file del tuo cloud storage preferito </string>
+</resources>
