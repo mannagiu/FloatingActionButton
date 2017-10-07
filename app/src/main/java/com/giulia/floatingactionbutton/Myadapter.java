@@ -1,6 +1,7 @@
 package com.giulia.floatingactionbutton;
 
 import android.content.Context;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -18,7 +19,10 @@ public class Myadapter extends BaseAdapter {
     private Context context;
     private ArrayList<Integer> listid;
     private ArrayList<String> nameList;
-    boolean[] itemChecked;
+    private SparseBooleanArray selectedListItemsIds;
+
+
+
 
 
     public Myadapter(Context context, ArrayList<Integer> listid, ArrayList<String> nameList) {
@@ -26,7 +30,8 @@ public class Myadapter extends BaseAdapter {
         this.context = context;
         this.listid = listid;
         this.nameList = nameList;
-        this.itemChecked = new boolean[nameList.size()];
+        selectedListItemsIds = new SparseBooleanArray();
+
     }
     /*private class ViewHolder {
         ImageView img;
@@ -34,41 +39,6 @@ public class Myadapter extends BaseAdapter {
         CheckBox ck1;
     }*/
 
-    @Override
-    public int getCount() {
-        return nameList.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return nameList.get( position );
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-    public Integer getImageId(int position){
-        return this.listid.get(position);
-    }
-
-    public void setChecked(){
-        for(int i=0;i<nameList.size();i++){
-            itemChecked[i]=false;
-        }
-
-    }
-
-
-
-    public void setItemChecked(int position){
-        this.itemChecked[position]=true;
-
-    }
-    public boolean isChecked(int position){
-        return this.itemChecked[position];
-
-    }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -76,8 +46,6 @@ public class Myadapter extends BaseAdapter {
         //  final ViewHolder holder;
         if (convertView == null) {
             convertView = View.inflate( context, R.layout.items_list, null );
-
-
         }
 
         ImageView images = (ImageView) convertView.findViewById( R.id.imageView );
@@ -87,13 +55,71 @@ public class Myadapter extends BaseAdapter {
         return convertView;
     }
 
+    @Override
+    public int getCount() {
+        return nameList.size();
+    }
+
+    @Override
+    public String getItem(int position) {
+        return nameList.get( position );
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    public int getItemPosition(String item){
+        return nameList.indexOf(item);
+    }
+
+    public Integer getImageId(int position){
+        return listid.get(position);
+    }
+
     public void setData(ArrayList<Integer> list1, ArrayList<String> list2){
 
         this.listid = list1;
         this.nameList = list2;
         notifyDataSetChanged();
 
+    }
+    public void remove(String stringa) {
+        listid.remove(getItemPosition(stringa));
+        nameList.remove(stringa);
+        notifyDataSetChanged();
+    }
 
+    public void rename (int pos, String r)
+    {
+        nameList.set(pos,r);
+        notifyDataSetChanged();
+
+    }
+    public void toggleSelection(int position) {
+        selectView(position, !selectedListItemsIds.get(position));
+    }
+
+    public void removeSelection() {
+        selectedListItemsIds = new SparseBooleanArray();
+        notifyDataSetChanged();
+    }
+
+    public void selectView(int position, boolean value) {
+        if (value)
+            selectedListItemsIds.put(position, value);
+        else
+            selectedListItemsIds.delete(position);
+        notifyDataSetChanged();
+    }
+
+    public int getSelectedCount() {
+        return selectedListItemsIds.size();
+    }
+
+    public SparseBooleanArray getSelectedIds() {
+        return selectedListItemsIds;
     }
 }
 

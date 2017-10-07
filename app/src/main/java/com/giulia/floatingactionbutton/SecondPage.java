@@ -10,6 +10,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -42,7 +43,7 @@ public class SecondPage extends AppCompatActivity {
     ArrayList<String> arrayItemNames, arrayItemNames1;
     //Gli array sopra dichiarati mi servono per riempire la listview
     //Struttura dati b-albero per tenere in memoria le cartelle ecc
-    ArrayList<SelectedItem> arraySelectedItems;
+    ArrayList<String> arraySelectedItems;
     //BTree<Myobject> allMyfiles;
     ArrayList<Myobject> arrayMyObjects;
     ArrayList<String> currentPath;
@@ -50,11 +51,12 @@ public class SecondPage extends AppCompatActivity {
     TextView textView1, textView11, textView0;
     ListView listView1;
     File FILE_PATH_SDCARD = Environment.getExternalStorageDirectory();
-    File FILE_DIRECTORIES = new File(FILE_PATH_SDCARD, "Documents/l.json");
-    File FILE_FILES = new File(FILE_PATH_SDCARD, "Documents/l1.json");
+    File FILE_DIRECTORIES = new File(FILE_PATH_SDCARD, "Documents/nuovo.json");
+    File FILE_FILES = new File(FILE_PATH_SDCARD, "Documents/nuovo1.json");
     int l = 0;
     JSONArray arrayDirectory, arrayFile;
-    SelectedItem s = new SelectedItem();
+
+
 
     String currentDir, currentDir1, reading, reading2;
     String nomeCartella;
@@ -64,6 +66,8 @@ public class SecondPage extends AppCompatActivity {
     Bundle datipassati;
     Myadapter myAdapter;
     Toolbar toolbar;
+    List listRowItems;
+    CustomListViewAdapter customListViewAdapter;
 
 
     @Override
@@ -77,7 +81,15 @@ public class SecondPage extends AppCompatActivity {
         arraySelectedItems = new ArrayList<>();
         arrayImages=new ArrayList<>();
         arrayItemNames = new ArrayList<>();
-        myAdapter=new Myadapter(SecondPage.this, arrayImages, arrayItemNames);
+
+
+        listRowItems = new ArrayList();
+        int images;
+        String itemNames;
+
+        //customListViewAdapter=new CustomListViewAdapter(SecondPage.this, R.layout.items_list,listRowItems);
+        myAdapter=new Myadapter(SecondPage.this,arrayImages,arrayItemNames);
+        listView1.setAdapter(myAdapter);
         currentPath = new ArrayList<>();
         currentPath.add(nomeCartella);
         currentDir = "/" + currentPath.get(0);
@@ -86,15 +98,17 @@ public class SecondPage extends AppCompatActivity {
         // toolbar.setTitle(currentDir);
 
         // arrayobj = new ArrayList<>();
-        listView1.setAdapter(myAdapter);
+
+        //listView1.setAdapter(customListViewAdapter);
 
         textView1 = (TextView) findViewById(R.id.textView1);
         textView11 = (TextView) findViewById(R.id.textView11);
 
         reading = leggiFile(FILE_DIRECTORIES);
         reading2 = leggiFile(FILE_FILES);
-        parseJson(arrayImages, arrayItemNames, nomeCartella);
-        //registerForContextMenu(listView1);
+
+        parseJson(arrayImages,arrayItemNames, nomeCartella);
+        registerForContextMenu(listView1);
 
 
         textView1.setText(reading);
@@ -107,8 +121,9 @@ public class SecondPage extends AppCompatActivity {
                 // recupero il titolo memorizzato nella riga tramite l'ArrayAdapter
                 String displayPath = "";
                 nomeCartella = (String) listView1.getItemAtPosition(pos);
+
                 Integer id1 = myAdapter.getImageId(pos);
-                if (id1.equals(R.drawable.ic_folder_grey)) {
+               if (id1.equals(R.drawable.ic_folder_grey)) {
 
 
                     if (nomeCartella.equals("..")) {
@@ -136,14 +151,19 @@ public class SecondPage extends AppCompatActivity {
 
                     textView0.setText(displayPath);
                     myAdapter.setData(arrayImages=new ArrayList<Integer>(),arrayItemNames=new ArrayList<String>());
-                    parseJson(arrayImages, arrayItemNames, nomeCartella);
+                    parseJson(arrayImages,arrayItemNames, nomeCartella);
 
-
-                }
-
-
-            }
+            }}
         });
+       /* listView1.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+              SelectedItem s1=new SelectedItem(position,listView1.getItemAtPosition(position).toString());
+
+               arraySelectedItems.add(s1);
+                return true;
+            }
+        });*/
 
         listView1.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
@@ -151,11 +171,18 @@ public class SecondPage extends AppCompatActivity {
         listView1.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-             if(checked)
+
+                final int checkedCount = listView1.getCheckedItemCount();
+                // Set the CAB title according to total checked items
+                mode.setTitle(checkedCount + " Selected");
+                // Calls toggleSelection method from ListViewAdapter Class
+                myAdapter.toggleSelection(position);
+                //arraySelectedItems.add(myAdapter.getItem(position));
+                /*SelectedItem s=new SelectedItem(position,myAdapter.getItem(position));
+
+                if(checked)
              {
 
-                 s.setNome((String) listView1.getItemAtPosition(position));
-                 s.setPos(position);
                  arraySelectedItems.add(s);
                  count++;
                  mode.setTitle(count + "elementi selezionati");
@@ -165,7 +192,7 @@ public class SecondPage extends AppCompatActivity {
                  //selection.remove(listView1.getItemAtPosition(position));
                  count--;
                  mode.setTitle(count + "elementi selezionati");
-             }
+             }*/
                 }
 
             @Override
@@ -180,8 +207,9 @@ public class SecondPage extends AppCompatActivity {
 
                 menu.getItem(0).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
                 menu.getItem(1).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                final int checkedCount = listView1.getCheckedItemCount();
 
-                switch (arraySelectedItems.size()) {
+                switch (checkedCount) {
                     case 1:
 
                         menu.getItem(0).setEnabled(true);
@@ -200,14 +228,25 @@ public class SecondPage extends AppCompatActivity {
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.delete:
+                        // call getSelectedIds method from customListViewAdapter
+                        SparseBooleanArray selected = myAdapter.getSelectedIds();
+                        // Captures all selected ids with a loop
+                        for (int i = (selected.size() - 1); i >= 0; i--) {
+                            if (selected.valueAt(i)) {
+                                String mia =  myAdapter.getItem(selected.keyAt(i));
+                                // Remove selected items using ids
 
-                        elimina(arraySelectedItems, arrayImages, arrayItemNames, nomeCartella);
-                        Toast.makeText(getBaseContext(), count + "elementi eliminati", Toast.LENGTH_SHORT).show();
-                        //textView1.setText(arrayRoot.toString());
-                        myAdapter.notifyDataSetChanged();
-                        String r = leggiFile(FILE_DIRECTORIES);
-                        textView1.setText(r);
-                        count = 0;
+                                elimina(mia,nomeCartella);
+                                myAdapter.remove(mia);
+                            }
+                        }
+                        myAdapter.removeSelection();
+
+
+
+
+                        // elimina(arraySelectedItems, arrayImages, arrayItemNames, nomeCartella);
+                        Toast.makeText(getBaseContext(), myAdapter.getSelectedCount() + "elementi eliminati", Toast.LENGTH_SHORT).show();
                         mode.finish();
                         return true;
 
@@ -223,9 +262,23 @@ public class SecondPage extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 if (!rinomina.getText().toString().isEmpty()) {
                                     Toast.makeText(SecondPage.this, "Elemento rinominato", Toast.LENGTH_SHORT).show();
-                                    String s = rinomina.getText().toString();
+                                    String s2 = rinomina.getText().toString();
+                                    SparseBooleanArray selected = myAdapter.getSelectedIds();
+                                    // Captures all selected ids with a loop
+                                    for (int i = (selected.size() - 1); i >= 0; i--) {
+                                        if (selected.valueAt(i)) {
+                                            String mia =  myAdapter.getItem(selected.keyAt(i));
+                                            rename(mia,s2,nomeCartella);
+                                            myAdapter.rename(myAdapter.getItemPosition(mia),s2);
 
-                                    rename(arraySelectedItems,arrayImages, arrayItemNames , s, nomeCartella);
+                                /*
+                                    String myAdapterItem=arraySelectedItems.get(0);
+                                    rename(myAdapterItem,s2,nomeCartella);
+                                    myAdapter.rename(myAdapter.getItemPosition(arraySelectedItems.get(0)),s2);
+                                    arraySelectedItems.clear();
+                                                                                */
+                                }}
+                                myAdapter.removeSelection();
                                 }
                             }
                         });
@@ -254,8 +307,8 @@ public class SecondPage extends AppCompatActivity {
 
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-                count=0;
-                arraySelectedItems.clear();
+                //myAdapter.removeSelection();
+              // arraySelectedItems.clear();
 
             }
         });
@@ -482,33 +535,27 @@ public class SecondPage extends AppCompatActivity {
 
     }
 
-    private void rename(ArrayList<SelectedItem> selezionati, ArrayList<Integer> immagini, ArrayList<String> nomi, String s1, String nomeCart) { //devo passare l'array contenente i miei oggetti
-        String temp, temp1;
-        String elem = selezionati.get(0).getNome();
+    private void rename( String elem, String s1, String nomeCart) { //devo passare l'array contenente i miei oggetti
+       String temp, temp1;
 
-        int k = selezionati.get(0).getPos();
         int flag = 0;
         int flag1 = 0;
         int flag2=0;
         int flag3=0;
-        int i = 0;
+
 
         JSONArray arrayUno;
         JSONArray arrayDue=new JSONArray();
         JSONArray arrayTre;
-
         JSONObject objUno= new JSONObject();
         JSONObject objDue=new JSONObject();
         JSONObject objTre=new JSONObject();
 
-
-        //RINOMINO SULLA LISTVIEW L'ELEMENTO
-       // myAdapter.setData(immagini,nomi);
-        nomi.set(k, s1);
         //AZZERO LA LISTA DEI SELEZIONATI
-        selezionati.clear();
         try {
-            if (immagini.get(k).equals(R.drawable.ic_folder_grey)) {
+
+            Integer im=myAdapter.getImageId(myAdapter.getItemPosition(elem));
+            if (im.equals(R.drawable.ic_folder_grey)) {
                 temp = leggiFile(FILE_DIRECTORIES);
                 arrayUno = new JSONArray(temp);
                     for (int index = 0; index < arrayUno.length() && flag == 0; index++) {
@@ -518,8 +565,7 @@ public class SecondPage extends AppCompatActivity {
                             String key = (String) iterator.next();
                             //se la chiave è uguale al nome della cartella dentro cui voglio rinominare
                             //accedo
-                            if (key.equals(nomeCart)&&flag2==0) {
-                                flag2=1;
+                            if (key.equals(nomeCart)&&flag1==0) {
                                 arrayDue = objDue.getJSONArray(key);
                                 for (int j = 0; j < arrayDue.length() && flag1 == 0; j++) {
                                     objTre = arrayDue.getJSONObject(j);
@@ -541,7 +587,7 @@ public class SecondPage extends AppCompatActivity {
                                 objDue.remove(key);
                                 objDue.put(s1, a);
                             }
-                            if(flag2==1&&flag3==1)
+                            if(flag1==1&&flag3==1)
                                 flag=1;
 
                         }
@@ -550,7 +596,7 @@ public class SecondPage extends AppCompatActivity {
                 flag=0;
                     temp1 = leggiFile(FILE_FILES);
                     arrayTre = new JSONArray(temp1);
-                    for (i = 0; i < arrayTre.length() && flag == 0; i++) {
+                    for (int i = 0; i < arrayTre.length() && flag == 0; i++) {
                         //Estraggo l' oggetto json dall'array, in particolare l'i-esimo oggetto json
                        objUno= arrayTre.getJSONObject(i);
                         //ottengo le chiavi che ci sono nel mio array json
@@ -570,6 +616,8 @@ public class SecondPage extends AppCompatActivity {
 
                 scriviFile(arrayUno.toString(), FILE_DIRECTORIES);
                 scriviFile(arrayTre.toString(), FILE_FILES);
+                textView1.setText(arrayUno.toString());
+                textView11.setText(arrayTre.toString());
 
 
             } else {
@@ -582,16 +630,15 @@ public class SecondPage extends AppCompatActivity {
                     while (iterator.hasNext() && flag == 0) {
                         String key = (String) iterator.next();
                         if (key.equals(nomeCart)) {
-                            flag = 1;
                             arrayDue = objDue.getJSONArray(key);
-                            for (int j = 0; j < arrayDue.length() && flag1 == 0; j++) {
+                            for (int j = 0; j < arrayDue.length() && flag == 0; j++) {
                                 objTre= arrayDue.getJSONObject(j);
                                 Iterator iterator1 = objTre.keys();
-                                while (iterator1.hasNext() && flag1 == 0) {
+                                while (iterator1.hasNext() && flag == 0) {
                                     String key1 = (String) iterator1.next();
 
                                     if (elem.equals(key1)) {
-                                        flag1 = 1;
+                                        flag = 1;
                                         objTre.remove(key1);
                                         objTre.put(s1, "file");
                                     }
@@ -601,6 +648,7 @@ public class SecondPage extends AppCompatActivity {
                     }
                 }
                 scriviFile(arrayUno.toString(), FILE_FILES);
+                textView11.setText(arrayUno.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -611,7 +659,7 @@ public class SecondPage extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void elimina(ArrayList<SelectedItem> daEliminare, ArrayList<Integer> immagini, ArrayList<String> nomi, String nomeCart) {
+    private void elimina(String msg, String nomeCart) {
         JSONArray parse;
         JSONArray parse1;
         JSONObject obj=new JSONObject();
@@ -625,19 +673,9 @@ public class SecondPage extends AppCompatActivity {
         int flag2=0;
         int flag3=0;
         String temp, temp1;
-        myAdapter.setData(immagini,nomi);
-        try {
-            for (SelectedItem sel : daEliminare) {
-
-                d = sel.getPos();
-                String msg = sel.getNome();
-                Integer id = immagini.get(d);
-                immagini.remove(d);
-                nomi.remove(msg);
-                //DEVO MODIFICARE QUI IL FILE
-                //modificafile();
-                //leggifile(FILE_DIRECTORIES);
-                if (id.equals(R.drawable.ic_folder_grey)) {
+     try{
+               Integer id= myAdapter.getImageId(myAdapter.getItemPosition(msg));
+         if (id.equals(R.drawable.ic_folder_grey)) {
                     temp1 = leggiFile(FILE_DIRECTORIES);
                     parse = new JSONArray(temp1);
                     for (k = 0; k < parse.length() && flag == 0; k++) {
@@ -645,8 +683,7 @@ public class SecondPage extends AppCompatActivity {
                         Iterator iterator = obj_nuovo2.keys();
                         while (iterator.hasNext() && flag == 0) {
                             String key = (String) iterator.next();
-                            if (key.equals(nomeCart)&&flag2==0) {
-                                flag2 = 1;
+                            if (key.equals(nomeCart)&&flag1==0) {
                                 array_nuovo2 = obj_nuovo2.getJSONArray(key);
                                 for (j = 0; j < array_nuovo2.length() && flag1 == 0; j++) {
                                     obj_nuovo3 = array_nuovo2.getJSONObject(j);
@@ -666,7 +703,7 @@ public class SecondPage extends AppCompatActivity {
                                 parse.remove(k);
 
                             }
-                            if(flag2==1&&flag3==1)
+                            if(flag1==1&&flag3==1)
                                 flag=1;
                         }
                     }
@@ -728,7 +765,7 @@ public class SecondPage extends AppCompatActivity {
                     textView11.setText(parse.toString());
                     scriviFile(parse.toString(), FILE_FILES);
                 }
-            }daEliminare.clear();
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -764,7 +801,7 @@ public class SecondPage extends AppCompatActivity {
         }
     }
 
-    public void parseJson(ArrayList<Integer> immagini, ArrayList<String> nomi, String nomeCart) {
+    public void parseJson(ArrayList<Integer> immagini,ArrayList<String> nomi, String nomeCart) {
         JSONArray arrayUno, arrayDue;
         JSONObject objUno = new JSONObject();
         JSONObject objDue = new JSONObject();
@@ -772,6 +809,8 @@ public class SecondPage extends AppCompatActivity {
         reading = leggiFile(FILE_DIRECTORIES);
         reading2 = leggiFile(FILE_FILES);
        // myAdapter.setData(immagini,nomi);
+        SelectedItem item=new SelectedItem(R.drawable.ic_folder_grey,"..");
+       // items.add(item);
         nomi.add("..");
         immagini.add(R.drawable.ic_folder_grey);
 
@@ -790,6 +829,7 @@ public class SecondPage extends AppCompatActivity {
                                     Iterator iterator2 = objDue.keys();
                                     while (iterator2.hasNext()) {
                                         String key2 = (String) iterator2.next();
+                                       // items.add(new SelectedItem(R.drawable.ic_folder_grey,key2));
                                         nomi.add(key2);
                                         immagini.add(R.drawable.ic_folder_grey);
 
@@ -812,8 +852,9 @@ public class SecondPage extends AppCompatActivity {
                             Iterator iterator2 = objDue.keys();
                             while (iterator2.hasNext()) {
                                 String key2 = (String) iterator2.next();
-                                nomi.add(key2);
-                                immagini.add(R.drawable.ic_file_blue);
+                                //items.add(new SelectedItem(R.drawable.ic_file_blue,key2));
+                               nomi.add(key2);
+                               immagini.add(R.drawable.ic_file_blue);
                             }
                         }
                     }

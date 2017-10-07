@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -34,9 +35,8 @@ public class Radice extends AppCompatActivity {
     FileInputStream fIn = null;
     FileOutputStream fOut = null;
     File FILE_PATH_SDCARD= Environment.getExternalStorageDirectory();
-    File FILE_DIRECTORIES=new File(FILE_PATH_SDCARD,"Documents/l.json" );
-    File FILE_FILES=new File(FILE_PATH_SDCARD,"Documents/l1.json" );
-    File fileDir=new File("");
+    File FILE_DIRECTORIES=new File(FILE_PATH_SDCARD,"Documents/nuovo.json" );
+    File FILE_FILES=new File(FILE_PATH_SDCARD,"Documents/nuovo1.json" );
     ListView lv0;
     ArrayList<Integer>list1;
     ArrayList<String> list2;
@@ -60,13 +60,31 @@ public class Radice extends AppCompatActivity {
 
         list1.add(R.drawable.ic_folder_grey);
         list2.add("Tutti i file");
+        String risultato=leggifile(FILE_DIRECTORIES);
+        String risultato1=leggifile(FILE_FILES);
+        if(risultato==""&&risultato1=="")
+        {
+            arrayExt=new JSONArray();
+            arrayInt=new JSONArray();
+            obj=new JSONObject();
+            try {
+                obj.put("Tutti i file",arrayInt);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            arrayExt.put(obj);
+
+            scrivifile(arrayExt.toString(),FILE_DIRECTORIES);
+            scrivifile(arrayExt.toString(),FILE_FILES);
+        }
+
 
         lv0.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String nomeCartella = (String) lv0.getItemAtPosition(position);
                 Intent pagina2 = new Intent(Radice.this, SecondPage.class);
-                pagina2.putExtra("dato", nomeCartella);
+                //pagina2.putExtra("dato", nomeCartella);
                 startActivity(pagina2);
 
 

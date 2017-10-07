@@ -1,35 +1,25 @@
 package com.giulia.floatingactionbutton;
 
-/**
- * Created by giulia on 03/10/17.
- */
 
 public class SelectedItem {
-    private String nome;
-    private int pos;
+    private int imageId;
+    private String itemName;
 
-    public SelectedItem(String nome, int pos) {
-        this.nome = nome;
-        this.pos = pos;
+    public SelectedItem(int imageId1, String title) {
+        this.imageId = imageId1;
+        this.itemName = title;
     }
-    public SelectedItem(){
-
+    public int getImageId() {
+        return imageId;
     }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setImageId(int imageId1) {
+        this.imageId = imageId1;
     }
 
-    public int getPos() {
-        return pos;
+    public String getItemName() {
+        return itemName;
     }
+    public void setItemName(String itemName1) {
+        this.itemName = itemName1;
 
-    public void setPos(int pos) {
-        this.pos = pos;
-    }
-}
-
+}}
