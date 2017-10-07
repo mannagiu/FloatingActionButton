@@ -13,8 +13,8 @@
         android:textSize="25dp"
         android:id="@+id/crea"
         android:textStyle="bold"
-        android:textColor="@android:color/holo_green_light"
-        android:textColorLink="@android:color/holo_green_dark"
+        android:textColor="#ffcd38"
+        android:textColorLink="#ffcd38"
         android:layout_marginTop="5dp"
         />
     <EditText
