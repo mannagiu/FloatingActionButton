@@ -35,67 +35,81 @@ public class Radice extends AppCompatActivity {
     FileInputStream fIn = null;
     FileOutputStream fOut = null;
     File FILE_PATH_SDCARD= Environment.getExternalStorageDirectory();
-    File FILE_DIRECTORIES=new File(FILE_PATH_SDCARD,"Documents/nuovo.json" );
+    Bundle datoPassato;
+    Bundle richiesta;
+
     File FILE_FILES=new File(FILE_PATH_SDCARD,"Documents/nuovo1.json" );
+    File extractFileName,fileDir,fileFile;
     ListView lv0;
     ArrayList<Integer>list1;
     ArrayList<String> list2;
     JSONObject obj;
     JSONArray arrayExt,arrayInt;
-    String res,res1;
+    String res,res1,choosedFile1;
+    String ric,choosedFile,fileName;
+    TextView tv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_radice);
-
+        tv=(TextView)findViewById(R.id.tv);
         lv0=(ListView) findViewById(R.id.listView0);
         list1=new ArrayList<>();
         list2=new ArrayList<>();
         final Myadapter ma=new Myadapter(Radice.this,list1,list2);
         lv0.setAdapter(ma);
-        obj=new JSONObject();
+        datoPassato=getIntent().getExtras();
+        choosedFile=datoPassato.getString("choosed file");
+
+                            /*oppure
+                             extractFileName.getAbsolutePath().substring(extractFileName.getAbsolutePath().lastIndexOf("\")+1)
+
+                             */
+
+        fileDir = new File(FILE_PATH_SDCARD, "Documents/"+choosedFile+".json");
 
 
 
 
         list1.add(R.drawable.ic_folder_grey);
         list2.add("Tutti i file");
-        String risultato=leggifile(FILE_DIRECTORIES);
-        String risultato1=leggifile(FILE_FILES);
-        if(risultato==""&&risultato1=="")
-        {
-            arrayExt=new JSONArray();
-            arrayInt=new JSONArray();
-            obj=new JSONObject();
-            try {
-                obj.put("Tutti i file",arrayInt);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            arrayExt.put(obj);
 
-            scrivifile(arrayExt.toString(),FILE_DIRECTORIES);
-            scrivifile(arrayExt.toString(),FILE_FILES);
+        arrayExt=new JSONArray();
+        arrayInt=new JSONArray();
+        obj=new JSONObject();
+        try {
+            obj.put("figli",arrayInt);
+            obj.put("nome","Tutti i file");
+            obj.put("tipo","dir");
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        arrayExt.put(obj);
+
+        String risultato=leggifile(fileDir);
+
+
+        if(risultato.equals(""))
+        {
+
+            scrivifile(arrayExt.toString(),fileDir);
+        }
+        else
+            tv.setText(risultato);
 
 
         lv0.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String nomeCartella = (String) lv0.getItemAtPosition(position);
+                //String nomeCartella = (String) lv0.getItemAtPosition(position);
                 Intent pagina2 = new Intent(Radice.this, SecondPage.class);
-                //pagina2.putExtra("dato", nomeCartella);
+                pagina2.putExtra("choosed file",choosedFile);
                 startActivity(pagina2);
-
 
             }
         });
 
     }
-
-
-
-
 
     private String leggifile(File f){
         FileInputStream stream;

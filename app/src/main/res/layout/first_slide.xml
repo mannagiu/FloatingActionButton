@@ -10,7 +10,7 @@
     <ImageView
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:src="@drawable/folderlove"
+        android:src="@drawable/jsonfile"
              android:scaleType="centerCrop"
         android:id="@+id/img1"
         android:layout_alignParentTop="true"
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tv1Slide1"
-        android:text="MODIFICA"
+        android:text="CREAZIONE"
         android:textColor="@android:color/white"
         android:gravity="center"
         android:textStyle="bold"

@@ -10,16 +10,20 @@
     <ImageView
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:src="@drawable/whitelock"
+        android:src="@drawable/edit"
         android:scaleType="centerCrop"
         android:id="@+id/img1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"/>
+        android:layout_marginTop="98dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/tv2Slide3"
+        android:layout_alignEnd="@+id/tv2Slide3"
+        android:layout_marginRight="28dp"
+        android:layout_marginEnd="28dp" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tv1Slide3"
-        android:text="SICUREZZA"
+        android:text="AGGIORNAMENTO"
         android:textColor="@android:color/white"
         android:gravity="center"
         android:textStyle="bold"
@@ -31,7 +35,7 @@
     <TextView
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Tutto questo in modo totalmente sicuro"
+        android:text="@string/slide_3_desc"
         android:textSize="18sp"
         android:id="@+id/tv2Slide3"
         android:textColor="#ffffff"

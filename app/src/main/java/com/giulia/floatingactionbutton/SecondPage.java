@@ -10,13 +10,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -35,8 +32,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class SecondPage extends AppCompatActivity {
     ArrayList<Integer> arrayImages, arrayImages1;
@@ -48,17 +43,19 @@ public class SecondPage extends AppCompatActivity {
     //Struttura dati b-albero per tenere in memoria le cartelle ecc
 
     ArrayList<String> currentPath;
-    TextView textView1, textView11;
+    TextView textView1, textView11, textView0;
     ListView listView1;
     File FILE_PATH_SDCARD = Environment.getExternalStorageDirectory();
-    File FILE_DIRECTORIES = new File(FILE_PATH_SDCARD, "Documents/nuovo.json");
-    File FILE_FILES = new File(FILE_PATH_SDCARD, "Documents/nuovo1.json");
+   // File FILE_DIRECTORIES = new File(FILE_PATH_SDCARD, "Documents/nuevo.json");
+    //File FILE_FILES = new File(FILE_PATH_SDCARD, "Documents/nuovo1.json");
+    File fileDir,fileFile;
     FloatingActionButton fAb,fAb2;
     FloatingActionsMenu floatingActionsMenu;
-
+    Bundle datoPassato;
+    Bundle richiesta;
 
     String currentDir,  reading, reading2;
-    String nomeCartella;
+    String nomeCartella,choosedFile,ric,fileName;
        Myadapter myAdapter;
 
 
@@ -66,12 +63,25 @@ public class SecondPage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second_page);
-        final List selection=new ArrayList<>();
+        datoPassato=getIntent().getExtras();
+       richiesta=getIntent().getExtras();
+       choosedFile=datoPassato.getString("choosed file");
+
+            fileDir = new File(FILE_PATH_SDCARD, "Documents/"+choosedFile+".json");
+
+
+
+
         listView1 = (ListView) findViewById(R.id.listView1);
-        final TextView textView0 = (TextView) findViewById(R.id.textView0);
+        textView0 = (TextView) findViewById(R.id.textView0);
         nomeCartella = "Tutti i file";
         arrayImages=new ArrayList<>();
         arrayItemNames = new ArrayList<>();
+
+        textView1 = (TextView) findViewById(R.id.textView1);
+        //textView11 = (TextView) findViewById(R.id.textView11);
+
+
         fAb=(FloatingActionButton)findViewById(R.id.addfolder);
         fAb2=(FloatingActionButton)findViewById(R.id.addfile);
         floatingActionsMenu=(FloatingActionsMenu)findViewById(R.id.menu);
@@ -92,7 +102,7 @@ public class SecondPage extends AppCompatActivity {
                             if (!cartella.getText().toString().isEmpty()) {
                                 Toast.makeText(SecondPage.this, "Cartella aggiunta", Toast.LENGTH_SHORT).show();
                                 String r = cartella.getText().toString();
-                                createDirectory(arrayImages,arrayItemNames, r, nomeCartella);
+                                create(arrayImages,arrayItemNames, r, nomeCartella,"dir");
 
 
                                 ;
@@ -135,7 +145,7 @@ public class SecondPage extends AppCompatActivity {
                                 if (!file.getText().toString().isEmpty()) {
                                     Toast.makeText(SecondPage.this, "File aggiunto", Toast.LENGTH_SHORT).show();
                                     String r1 = file.getText().toString();
-                                    createFile(arrayImages,arrayItemNames, r1,nomeCartella);
+                                    create(arrayImages,arrayItemNames, r1,nomeCartella,"file");
 
                                 }
                                 floatingActionsMenu.collapse();
@@ -173,6 +183,7 @@ public class SecondPage extends AppCompatActivity {
             }
         });
 
+
         //customListViewAdapter=new CustomListViewAdapter(SecondPage.this, R.layout.items_list,listRowItems);
         myAdapter=new Myadapter(SecondPage.this,arrayImages,arrayItemNames);
         listView1.setAdapter(myAdapter);
@@ -181,18 +192,17 @@ public class SecondPage extends AppCompatActivity {
         currentDir = "/" + currentPath.get(0);
         textView0.setText(currentDir);
 
-        textView1 = (TextView) findViewById(R.id.textView1);
-        textView11 = (TextView) findViewById(R.id.textView11);
 
-        reading = readFile(FILE_DIRECTORIES);
-        reading2 = readFile(FILE_FILES);
-
+        reading = readFile(fileDir);
+        //reading2 = readFile(fileFile);
+        textView1.setText(reading);
         parseJson(arrayImages,arrayItemNames, nomeCartella);
         registerForContextMenu(listView1);
 
 
-        textView1.setText(reading);
-        textView11.setText(reading2);
+       // textView1.setText(reading);
+        //textView11.setText(reading2);
+
 
 
         listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -203,37 +213,41 @@ public class SecondPage extends AppCompatActivity {
                 nomeCartella = (String) listView1.getItemAtPosition(pos);
 
                 Integer id1 = myAdapter.getImageId(pos);
-               if (id1.equals(R.drawable.ic_folder_grey)) {
+               if (id1.equals(R.drawable.ic_arrow_back_black_24dp)) {
 
-
-                    if (nomeCartella.equals("..")) {
                         currentPath.remove(currentPath.size() - 1);
+
                         if (currentPath.size() == 0) {
 
                             Intent intent = new Intent(SecondPage.this, Radice.class);
                             startActivity(intent);
+                            finish();
 
                         } else
                             nomeCartella = currentPath.get(currentPath.size() - 1);
 
-                    } else {
-                        if (currentPath.size() == 0)
-                            currentPath.add(currentDir);
 
-                        currentPath.add(nomeCartella);
+                    } else if(id1.equals(R.drawable.ic_folder_grey)) {
 
 
-                    }
+                   if (currentPath.size() == 0)
+                       currentPath.add(currentDir);
+
+                   currentPath.add(nomeCartella);
+
+               }
+
                     // monto il path corrente
                     for (String elem : currentPath) {
                         displayPath += "/" + elem;
                     }
 
                     textView0.setText(displayPath);
+
                     myAdapter.setData(arrayImages=new ArrayList<Integer>(),arrayItemNames=new ArrayList<String>());
                     parseJson(arrayImages,arrayItemNames, nomeCartella);
 
-            }}
+            }
         });
        /* listView1.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -308,6 +322,7 @@ public class SecondPage extends AppCompatActivity {
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.delete:
+                        int count=0;
                         // call getSelectedIds method from customListViewAdapter
                         SparseBooleanArray selected = myAdapter.getSelectedIds();
                         // Captures all selected ids with a loop
@@ -315,18 +330,24 @@ public class SecondPage extends AppCompatActivity {
                             if (selected.valueAt(i)) {
                                 String mia =  myAdapter.getItem(selected.keyAt(i));
                                 // Remove selected items using ids
-
+                                int a=myAdapter.getItemPosition(mia);
+                                if(myAdapter.getImageId(a).equals(R.drawable.ic_arrow_back_black_24dp))
+                                {Toast.makeText(getApplicationContext(),"Impossibile eliminare l'elemento <---",Toast.LENGTH_LONG).show();}
+                                else
+                                {count++;
                                 delete(mia,nomeCartella);
                                 myAdapter.remove(mia);
-                            }
+                                    Toast.makeText(getBaseContext(), count + "elementi eliminati", Toast.LENGTH_SHORT).show();
+                            }}
                         }
-                        myAdapter.removeSelection();
+
 
 
 
 
                         // elimina(arraySelectedItems, arrayImages, arrayItemNames, nomeCartella);
-                        Toast.makeText(getBaseContext(), myAdapter.getSelectedCount() + "elementi eliminati", Toast.LENGTH_SHORT).show();
+
+                        myAdapter.removeSelection();
                         mode.finish();
                         return true;
 
@@ -334,22 +355,31 @@ public class SecondPage extends AppCompatActivity {
                         final AlertDialog.Builder mBuilder = new AlertDialog.Builder(SecondPage.this);
                         final View mView = getLayoutInflater().inflate(R.layout.dialog_rename, null);
                         final EditText rinomina = (EditText) mView.findViewById(R.id.rinomina_cartella);
+                        final SparseBooleanArray selecte = myAdapter.getSelectedIds();
 
+                            if (selecte.valueAt(selecte.size()-1)) {
 
-                        mBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (!rinomina.getText().toString().isEmpty()) {
-                                    Toast.makeText(SecondPage.this, "Elemento rinominato", Toast.LENGTH_SHORT).show();
-                                    String s2 = rinomina.getText().toString();
-                                    SparseBooleanArray selected = myAdapter.getSelectedIds();
-                                    // Captures all selected ids with a loop
-                                    for (int i = (selected.size() - 1); i >= 0; i--) {
-                                        if (selected.valueAt(i)) {
-                                            String mia =  myAdapter.getItem(selected.keyAt(i));
-                                            rename(mia,s2,nomeCartella);
-                                            myAdapter.rename(myAdapter.getItemPosition(mia),s2);
+                                final String mia = myAdapter.getItem(selecte.keyAt(0));
+                                int a = myAdapter.getItemPosition(mia);
+                                if (myAdapter.getImageId(a).equals(R.drawable.ic_arrow_back_black_24dp)) {
+                                    Toast.makeText(getApplicationContext(), "Impossibile rinominare l'elemento", Toast.LENGTH_LONG).show();
+                                    myAdapter.removeSelection();
+                                    return true;
+                                } else
+
+                                {
+
+                                    mBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (!rinomina.getText().toString().isEmpty()) {
+                                                Toast.makeText(SecondPage.this, "Elemento rinominato", Toast.LENGTH_SHORT).show();
+                                                String s2 = rinomina.getText().toString();
+                                                // Captures all selected ids with a loop
+                                                rename(mia, s2, nomeCartella);
+                                                myAdapter.rename(myAdapter.getItemPosition(mia), s2);
+                                            }
 
                                 /*
                                     String myAdapterItem=arraySelectedItems.get(0);
@@ -357,29 +387,28 @@ public class SecondPage extends AppCompatActivity {
                                     myAdapter.rename(myAdapter.getItemPosition(arraySelectedItems.get(0)),s2);
                                     arraySelectedItems.clear();
                                                                                 */
-                                }}
-                                myAdapter.removeSelection();
+
+
+                                            myAdapter.removeSelection();
+
+                                        }
+                                    });
+
+                                    mBuilder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int which) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    });
+                                    mBuilder.setView(mView);
+                                    AlertDialog dialog = mBuilder.create();
+                                    dialog.show();
+
+                                    mode.finish();
+                                    return true;
                                 }
                             }
-                        });
-
-                        mBuilder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int which) {
-                                dialogInterface.dismiss();
-                            }
-                        });
-                        mBuilder.setView(mView);
-                        AlertDialog dialog = mBuilder.create();
-                        dialog.show();
-
-                        mode.finish();
-                        return true;
-
-
-                    default:
-
-                        return false;
+                    default:return false;
                 }
 
 
@@ -406,7 +435,7 @@ public class SecondPage extends AppCompatActivity {
                         if (!cartella.getText().toString().isEmpty()) {
                             Toast.makeText(SecondPage.this, "Cartella aggiunta", Toast.LENGTH_SHORT).show();
                             String r = cartella.getText().toString();
-                            createDirectory(arrayImages,arrayItemNames, r, nomeCartella);
+                            create(arrayImages,arrayItemNames, r, nomeCartella,"dir");
 
                             ;
                             //textview.setText(str);
@@ -442,7 +471,7 @@ public class SecondPage extends AppCompatActivity {
                         if (!file.getText().toString().isEmpty()) {
                             Toast.makeText(SecondPage.this, "File aggiunto", Toast.LENGTH_SHORT).show();
                             String r1 = file.getText().toString();
-                            createFile(arrayImages,arrayItemNames, r1,nomeCartella);
+                            create(arrayImages,arrayItemNames, r1,nomeCartella,"file");
 
                         }
 
@@ -471,14 +500,7 @@ public class SecondPage extends AppCompatActivity {
 
 
     //end of OnCreate
-    private void RunAnimation()
-    {
-        Animation a = AnimationUtils.loadAnimation(this, R.anim.animation_textview);
-        a.reset();
-        TextView tv = (TextView) findViewById(R.id.textView0);
-        tv.clearAnimation();
-        tv.startAnimation(a);
-    }
+
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -495,7 +517,7 @@ public class SecondPage extends AppCompatActivity {
                         if (!cartella.getText().toString().isEmpty()) {
                             Toast.makeText(SecondPage.this, "Cartella aggiunta", Toast.LENGTH_SHORT).show();
                             String r = cartella.getText().toString();
-                            createDirectory(arrayImages,arrayItemNames, r, nomeCartella);
+                            create(arrayImages,arrayItemNames, r, nomeCartella,"dir");
 
                             ;
                             //textview.setText(str);
@@ -526,7 +548,7 @@ public class SecondPage extends AppCompatActivity {
                         if (!file.getText().toString().isEmpty()) {
                             Toast.makeText(SecondPage.this, "File aggiunto", Toast.LENGTH_SHORT).show();
                             String r1 = file.getText().toString();
-                            createFile(arrayImages,arrayItemNames, r1,nomeCartella);
+                            create(arrayImages,arrayItemNames, r1,nomeCartella,"file");
 
                         }
 
@@ -566,19 +588,8 @@ public class SecondPage extends AppCompatActivity {
 
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if(nomeCartella.equals("Tutti i file")){
-            Intent intent = new Intent(SecondPage.this, Radice.class);
-            startActivity(intent);
-            return true;}
 
-        }
-
-        return false;
-    }
-
-    private void createDirectory(ArrayList<Integer> immagini, ArrayList<String> nomi, String r1, String nomeCart) {
+    private void create(ArrayList<Integer> immagini, ArrayList<String> nomi, String r1, String nomeCart,String tipo) {
         JSONObject obj_nuovo1, obj_nuovo2, obj_nuovo3;
         JSONArray array_nuovo1, array_nuovo2, parse;
         obj_nuovo1 = new JSONObject();
@@ -586,16 +597,22 @@ public class SecondPage extends AppCompatActivity {
         obj_nuovo2 = new JSONObject();
         obj_nuovo3 = new JSONObject();
         array_nuovo2 = new JSONArray();
+        parse=new JSONArray();
+        String name;
 
-        String risultato = readFile(FILE_DIRECTORIES);
+        String risultato = readFile(fileDir);
         int flag = 0;
         //Creare un nuovo oggetto e aggiungerlo all'albero
         //Myobject o = new Myobject(r, "dir", false);
         //arrayMyObjects.add(o);
         //AGGIUNGO ALLA LISTVIEW GLI ELEMENTI
        // myAdapter.setData(immagini,nomi);
+
         nomi.add(r1);
-        immagini.add(R.drawable.ic_folder_grey);
+        if(tipo.equals("dir"))
+            immagini.add(R.drawable.ic_folder_grey);
+        else
+            immagini.add(R.drawable.ic_file_blue);
         //CREO L'OGGETTO JSON CORRISPONDENTE ALLA SCRITTURA
         /*
         * Devo creare un oggetto json da inserire nell'array json principale
@@ -603,13 +620,20 @@ public class SecondPage extends AppCompatActivity {
         * */
         try {
             parse = new JSONArray(risultato);
-            obj_nuovo1.put(r1, array_nuovo1);
-            parse.put(obj_nuovo1);
-            obj_nuovo3.put(r1, "dir");
+            obj_nuovo3.put("nome",r1);
+            obj_nuovo3.put("tipo", tipo);
 
-            for (int i = 0; i < parse.length(); i++) {
+            for (int i = 0; i < parse.length()&&flag==0; i++) {
                 obj_nuovo2 = parse.getJSONObject(i);
-                Iterator iterator = obj_nuovo2.keys();
+               name = obj_nuovo2.getString("nome");
+                if (name.equals(nomeCart)) {
+                    flag = 1;
+                    array_nuovo2 = obj_nuovo2.getJSONArray("figli");
+                    array_nuovo2.put(obj_nuovo3);
+                }
+
+            }
+                /*Iterator iterator = obj_nuovo2.keys();
                 while (iterator.hasNext() && flag == 0) {
                     String key = (String) iterator.next();
                     if (key.equals(nomeCart)) {
@@ -618,77 +642,34 @@ public class SecondPage extends AppCompatActivity {
                         array_nuovo2.put(obj_nuovo3);
 
                     }
-            }}
+            }*/
+
+
+            /*Se non ho trovato la cartella tra gli oggetti json principali
+            significa che la cartella era vuota,la devo creare e inserisco la sottocartella
+             */
+            if(flag==0)
+            {
+                obj_nuovo3.put("nome",r1);
+                obj_nuovo3.put("tipo",tipo);
+                array_nuovo1.put(obj_nuovo3);
+                obj_nuovo1.put("figli",array_nuovo1);
+                obj_nuovo1.put("nome",nomeCart);
+                obj_nuovo1.put("tipo","dir");
+                parse.put(obj_nuovo1);
+            }
+
             risultato = parse.toString();
             textView1.setText(risultato);
-            writeFile(risultato, FILE_DIRECTORIES);
+            writeFile(risultato, fileDir);
+
         }catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-
-    private void createFile(ArrayList<Integer> immagini, ArrayList<String> nomi, String r,String nomeCart) {
-        JSONObject obj_nuovo1, obj_nuovo2, obj_nuovo3;
-        JSONArray parse, array_nuovo1, array_nuovo2;
-        obj_nuovo1 = new JSONObject();
-        array_nuovo1 = new JSONArray();
-        obj_nuovo2 = new JSONObject();
-        obj_nuovo3 = new JSONObject();
-        array_nuovo2 = new JSONArray();
-        String risultato = readFile(FILE_FILES);
-        String key;
-        int flag = 0;
-
-        //Creare un nuovo oggetto e aggiungerlo all'albero
-        //Myobject o = new Myobject(r, "file", false);
-        //arrayMyObjects.add(o);
-
-        //AGGIUNGO ALLA LISTVIEW GLI ELEMENTI
-        nomi.add(r);
-        immagini.add(R.drawable.ic_file_blue);
-        //CREO L'OGGETTO JSON CORRISPONDENTE PER LA SCRITTURA
-
-        try {
-            parse = new JSONArray(risultato);
-            for (int i = 0; i < parse.length() && flag == 0; i++) {
-                obj_nuovo2 = parse.getJSONObject(i);
-                Iterator iterator = obj_nuovo2.keys();
-                while (iterator.hasNext() && flag == 0) {
-                    key = (String) iterator.next();
-                    if (key.equals(nomeCart)) {
-                        flag = 1;
-                        array_nuovo2 = obj_nuovo2.getJSONArray(key);
-                        obj_nuovo3.put(r, "file");
-                        array_nuovo2.put(obj_nuovo3);
-
-                    }
-                }
-
-
-                }
-            if (flag == 0) {
-                obj_nuovo3.put(r,"file");
-                array_nuovo1.put(obj_nuovo3);
-                obj_nuovo1.put(nomeCart, array_nuovo1);
-                parse.put(obj_nuovo1);
-
-            }
-
-            risultato = parse.toString();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-        textView11.setText(risultato);
-        writeFile(risultato, FILE_FILES);
-
-    }
-
     private void rename( String elem, String s1, String nomeCart) { //devo passare l'array contenente i miei oggetti
-       String temp, temp1;
+       String temp, temp1,tipo;
 
         int flag = 0;
         int flag1 = 0;
@@ -706,100 +687,48 @@ public class SecondPage extends AppCompatActivity {
         try {
 
             Integer im=myAdapter.getImageId(myAdapter.getItemPosition(elem));
-            if (im.equals(R.drawable.ic_folder_grey)) {
-                temp = readFile(FILE_DIRECTORIES);
+            if (im.equals(R.drawable.ic_folder_grey))
+                tipo="dir";
+            else
+                tipo="file";
+
+            {
+                temp = readFile(fileDir);
                 arrayUno = new JSONArray(temp);
-                    for (int index = 0; index < arrayUno.length() && flag == 0; index++) {
-                        objDue = arrayUno.getJSONObject(index);
-                        Iterator iterator = objDue.keys();
-                        while (iterator.hasNext() && flag == 0) {
-                            String key = (String) iterator.next();
-                            //se la chiave è uguale al nome della cartella dentro cui voglio rinominare
-                            //accedo
-                            if (key.equals(nomeCart)&&flag1==0) {
-                                arrayDue = objDue.getJSONArray(key);
-                                for (int j = 0; j < arrayDue.length() && flag1 == 0; j++) {
-                                    objTre = arrayDue.getJSONObject(j);
-                                    Iterator iterator1 = objTre.keys();
-                                    while (iterator1.hasNext() && flag1 == 0) {
-                                        String key1 = (String) iterator1.next();
-                                        if (elem.equals(key1)) {
-                                            flag1 = 1;
-                                            objTre.remove(key1);
-                                            objTre.put(s1, "dir");
-
-                                        }
-                                    }
-                                }
-                            }
-                            else if (key.equals(elem)&&flag3==0) {
-                                flag3=1;
-                                JSONArray a = objDue.getJSONArray(key);
-                                objDue.remove(key);
-                                objDue.put(s1, a);
-                            }
-                            if(flag1==1&&flag3==1)
-                                flag=1;
-
-                        }
-                    }
-                    //MODIFICO ALL'INTERNO DEL FILE CONTENENTE I FILE
-                flag=0;
-                    temp1 = readFile(FILE_FILES);
-                    arrayTre = new JSONArray(temp1);
-                    for (int i = 0; i < arrayTre.length() && flag == 0; i++) {
-                        //Estraggo l' oggetto json dall'array, in particolare l'i-esimo oggetto json
-                       objUno= arrayTre.getJSONObject(i);
-                        //ottengo le chiavi che ci sono nel mio array json
-                        Iterator iterator = objUno.keys();
-                        while (iterator.hasNext() && flag == 0) {
-                            String key = (String) iterator.next();
-                            if (elem.equals(key)) {
-                                flag = 1;
-                                JSONArray a = objUno.getJSONArray(key);
-                                objUno.remove(key);
-                                objUno.put(s1, a);
-                            }
-
-                        }
-                    }
-
-
-                writeFile(arrayUno.toString(), FILE_DIRECTORIES);
-                writeFile(arrayTre.toString(), FILE_FILES);
-                textView1.setText(arrayUno.toString());
-                textView11.setText(arrayTre.toString());
-
-
-            } else {
-
-                temp = readFile(FILE_FILES);
-                arrayUno=new JSONArray(temp);
                 for (int index = 0; index < arrayUno.length() && flag == 0; index++) {
                     objDue = arrayUno.getJSONObject(index);
-                    Iterator iterator = objDue.keys();
-                    while (iterator.hasNext() && flag == 0) {
-                        String key = (String) iterator.next();
-                        if (key.equals(nomeCart)) {
-                            arrayDue = objDue.getJSONArray(key);
-                            for (int j = 0; j < arrayDue.length() && flag == 0; j++) {
-                                objTre= arrayDue.getJSONObject(j);
-                                Iterator iterator1 = objTre.keys();
-                                while (iterator1.hasNext() && flag == 0) {
-                                    String key1 = (String) iterator1.next();
-
-                                    if (elem.equals(key1)) {
-                                        flag = 1;
-                                        objTre.remove(key1);
-                                        objTre.put(s1, "file");
-                                    }
-                                }
+                    if (objDue.getString("nome").equals(nomeCart)) {
+                        //accedi all'array figli
+                        arrayDue = objDue.getJSONArray("figli");
+                        for (int j = 0; j < arrayDue.length() && flag1 == 0; j++) {
+                            objTre = arrayDue.getJSONObject(j);
+                            if (objTre.getString("nome").equals(elem)) {
+                                flag1 = 1;
+                                objTre.remove("nome");
+                                objTre.put("nome", s1);
                             }
+
                         }
+
+                    } else if (objDue.getString("nome").equals(elem) && tipo.equals("dir")) {
+                        flag3 = 1;
+                        JSONArray a = objDue.getJSONArray("figli");
+                        objDue.remove("nome");
+                        objDue.put("nome", s1);
                     }
+                    if (flag1 == 1 && flag3 == 1)
+                        flag = 1;
+
                 }
-                writeFile(arrayUno.toString(), FILE_FILES);
-                textView11.setText(arrayUno.toString());
+
+
+                //MODIFICO ALL'INTERNO DEL FILE CONTENENTE I FILE
+
+                writeFile(arrayUno.toString(), fileDir);
+
+                 textView1.setText(arrayUno.toString());
+                //textView11.setText(arrayTre.toString());
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -811,115 +740,82 @@ public class SecondPage extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void delete(String msg, String nomeCart) {
-        JSONArray parse;
-        JSONArray parse1;
-        JSONObject obj=new JSONObject();
-        JSONObject obj_nuovo3=new JSONObject();
-        JSONArray array_nuovo2=new JSONArray();
-        JSONObject obj_nuovo2 = new JSONObject();
-        int i, j, k, d;
-        Myobject o = new Myobject();
+        String temp, temp1,tipo;
+
         int flag = 0;
         int flag1 = 0;
-        int flag2=0;
         int flag3=0;
-        String temp, temp1;
-     try{
-               Integer id= myAdapter.getImageId(myAdapter.getItemPosition(msg));
-         if (id.equals(R.drawable.ic_folder_grey)) {
-                    temp1 = readFile(FILE_DIRECTORIES);
-                    parse = new JSONArray(temp1);
-                    for (k = 0; k < parse.length() && flag == 0; k++) {
-                        obj_nuovo2 = parse.getJSONObject(k);
-                        Iterator iterator = obj_nuovo2.keys();
-                        while (iterator.hasNext() && flag == 0) {
-                            String key = (String) iterator.next();
-                            if (key.equals(nomeCart)&&flag1==0) {
-                                array_nuovo2 = obj_nuovo2.getJSONArray(key);
-                                for (j = 0; j < array_nuovo2.length() && flag1 == 0; j++) {
-                                    obj_nuovo3 = array_nuovo2.getJSONObject(j);
-                                    Iterator iterator1 = obj_nuovo3.keys();
-                                    while (iterator1.hasNext() && flag1 == 0) {
-                                        String key1 = (String) iterator1.next();
-                                        if (key1.equals(msg)) {
-                                            flag1 = 1;
-                                            obj_nuovo3.remove(key1);
-                                            array_nuovo2.remove(j);
-                                        }
-                                    }
-                                }
-                            } else if (key.equals(msg)&&flag3==0) {
-                                flag3 = 1;
-                                obj_nuovo2.remove(key);
-                                parse.remove(k);
 
-                            }
-                            if(flag1==1&&flag3==1)
-                                flag=1;
-                        }
-                    }
-                    flag=0;
 
-                    //DEVO CANCELLARE ANCHE NEL FILE 2
-                    temp1 = readFile(FILE_FILES);
-                    parse1 = new JSONArray(temp1);
-                    for (i = 0; i < parse1.length() && flag == 0; i++) {
-                        //Estraggo l' oggetto json dall'array, in particolare l'i-esimo oggetto json
-                        obj = parse1.getJSONObject(i);
-                        //ottengo le chiavi che ci sono nel mio array json
-                        Iterator iterator = obj.keys();
-                        while (iterator.hasNext() && flag == 0) {
-                            String key = (String) iterator.next();
-                            if (msg.equals(key)) {
-                                flag = 1;
-                                obj.remove(key);
-                                parse1.remove(i);
+        JSONArray arrayUno;
+        JSONArray arrayDue=new JSONArray();
+        JSONArray arrayTre;
+        JSONObject objUno= new JSONObject();
+        JSONObject objDue=new JSONObject();
+        JSONObject objTre=new JSONObject();
+        JSONObject objQuattro=new JSONObject();
+
+        //AZZERO LA LISTA DEI SELEZIONATI
+        try {
+
+            Integer im=myAdapter.getImageId(myAdapter.getItemPosition(msg));
+            if (im.equals(R.drawable.ic_folder_grey))
+                tipo="dir";
+            else
+                tipo="file";
+
+
+                temp = readFile(fileDir);
+                arrayUno = new JSONArray(temp);
+                for (int index = 0; index < arrayUno.length() && flag == 0; index++) {
+                    objDue = arrayUno.getJSONObject(index);
+                    if (objDue.getString("nome").equals(nomeCart)) {
+                        //accedi all'array figli
+                        arrayDue = objDue.getJSONArray("figli");
+                        for (int j = 0; j < arrayDue.length() && flag1 == 0; j++) {
+                            objTre = arrayDue.getJSONObject(j);
+                            if (objTre.getString("nome").equals(msg)) {
+                                flag1 = 1;
+                                arrayDue.remove(j);
+
                             }
 
                         }
+
+                    } else if (objDue.getString("nome").equals(msg) && tipo.equals("dir")) {
+                        flag3 = 1;
+                        arrayTre=objDue.getJSONArray("figli");
+
+                        //devo andare a vedere se questa cartella che voglio eliminare
+                        //aveva qualcosa al suo interno ed eliminare tutto quello che aveva
+                        arrayUno.remove(index);
+                        /* in questo caso devo salvare il contenuto di questa cartella
+                            ed eliminarla dalla struttura dati, anche se eliminando direttamente
+                            il nodo il problema non si pone, me la canto e me la suono
+                         */
+                        for(int i=0;i<arrayTre.length();i++) {
+                            objQuattro=arrayTre.getJSONObject(i);
+                            delete(objQuattro.getString("nome"),msg);
+                        }
                     }
-                    textView1.setText(parse.toString());
-                    textView11.setText(parse1.toString());
-                    writeFile(parse.toString(), FILE_DIRECTORIES);
-                    writeFile(parse1.toString(), FILE_FILES);
+                    if (flag1 == 1 && flag3 == 1)
+                        flag = 1;
+
                 }
 
-                //se voglio eliminare un file, leggo solo il file files e cerco
-                else {
 
-                    temp = readFile(FILE_FILES);
-                    parse = new JSONArray(temp);
-                    for (int index = 0; index < parse.length() && flag == 0; index++) {
-                        obj_nuovo2 = parse.getJSONObject(index);
-                        Iterator iterator = obj_nuovo2.keys();
-                        while (iterator.hasNext() && flag == 0) {
-                            String key = (String) iterator.next();
-                            if (key.equals(nomeCart)) {
-                                flag = 1;
-                                array_nuovo2 = obj_nuovo2.getJSONArray(key);
-                                for (j = 0; j < array_nuovo2.length() && flag1 == 0; j++) {
-                                    obj_nuovo3 = array_nuovo2.getJSONObject(j);
-                                    Iterator iterator1 = obj_nuovo3.keys();
-                                    while (iterator1.hasNext() && flag1 == 0) {
-                                        String key1 = (String) iterator1.next();
-                                        if (msg.equals(key1)) {
-                                            flag1 = 1;
-                                            obj_nuovo3.remove(key1);
-                                            array_nuovo2.remove(j);
 
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    textView11.setText(parse.toString());
-                    writeFile(parse.toString(), FILE_FILES);
-                }
+                //MODIFICO ALL'INTERNO DEL FILE CONTENENTE I FILE
+
+                writeFile(arrayUno.toString(), fileDir);
+
+                textView1.setText(arrayUno.toString());
+                //textView11.setText(arrayTre.toString());
 
 
         } catch (Exception e) {
             e.printStackTrace();
+
         }
     }
 
@@ -957,101 +853,34 @@ public class SecondPage extends AppCompatActivity {
         JSONObject objUno = new JSONObject();
         JSONObject objDue = new JSONObject();
         int i, j;
-        reading = readFile(FILE_DIRECTORIES);
-        reading2 = readFile(FILE_FILES);
+        int flag=0;
+        reading = readFile(fileDir);
        // myAdapter.setData(immagini,nomi);
        // items.add(item);
         nomi.add("..");
-        immagini.add(R.drawable.ic_folder_grey);
+        immagini.add(R.drawable.ic_arrow_back_black_24dp);
 
 
         try {
             arrayUno = new JSONArray(reading);
-                for (i = 0; i < arrayUno.length(); i++) {
+                for (i = 0; i < arrayUno.length()&&flag==0; i++) {
                     objUno = arrayUno.getJSONObject(i);
-                    Iterator iterator = objUno.keys();
-                    while (iterator.hasNext()) {
-                        String key = (String) iterator.next();
-                        if (key.equals(nomeCart))
-                        {  arrayDue = objUno.getJSONArray(key);
-                          for (j = 0; j < arrayDue.length(); j++) {
-                                    objDue= arrayDue.getJSONObject(j);
-                                    Iterator iterator2 = objDue.keys();
-                                    while (iterator2.hasNext()) {
-                                        String key2 = (String) iterator2.next();
-                                       // items.add(new SelectedItem(R.drawable.ic_folder_grey,key2));
-                                        nomi.add(key2);
-                                        immagini.add(R.drawable.ic_folder_grey);
+                    if(objUno.getString("nome").equals(nomeCart))
+                    {   flag=1;
+                        arrayDue=objUno.getJSONArray("figli");
+                    for (j = 0; j < arrayDue.length(); j++) {
+                        objDue=arrayDue.getJSONObject(j);
+                        nomi.add(objDue.getString("nome"));
+                        if(objDue.getString("tipo").equals("dir"))
+                            immagini.add(R.drawable.ic_folder_grey);
+                        else
+                            immagini.add(R.drawable.ic_file_blue);
 
-                        }
-                    }
+                    }}}
 
-            }}}
-
-            //ADESSO FACCIO IL PARSE DEL FILE CONTENENTE I FILES
-           arrayUno = new JSONArray(reading2);
-            for (i = 0; i < arrayUno.length(); i++) {
-                objUno = arrayUno.getJSONObject(i);
-                Iterator iterator1 = objUno.keys();
-                while (iterator1.hasNext()) {
-                    String key1 = (String) iterator1.next();
-                    if (key1.equals(nomeCart)) {
-                       arrayDue = objUno.getJSONArray(key1);
-                        for (j = 0; j < arrayDue.length(); j++) {
-                            objDue = arrayDue.getJSONObject(j);
-                            Iterator iterator2 = objDue.keys();
-                            while (iterator2.hasNext()) {
-                                String key2 = (String) iterator2.next();
-                                //items.add(new SelectedItem(R.drawable.ic_file_blue,key2));
-                               nomi.add(key2);
-                               immagini.add(R.drawable.ic_file_blue);
-                            }
-                        }
-                    }
-                }
-
-
-
-            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 }
-
-//POSSO FARE LA LETTURA DEL FILE ANCHE COSÌ,
-/*
-*   try {
-            stream = new FileInputStream(yourFile);
-
-            try {
-                fc = stream.getChannel();
-                bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-
-                jsonStr = Charset.defaultCharset().decode(bb).toString();
-                tv.setText(jsonStr);
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                stream.close();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-
-
-
-
-
-
-
-
-
-
-
 

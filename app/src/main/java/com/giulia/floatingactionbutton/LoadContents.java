@@ -25,7 +25,7 @@ public class LoadContents extends AppCompatActivity {
 
     public void loadFirstPage(View view){
         new PreferenceManager(this).clearPreference();
-        startActivity(new Intent(this,Radice.class));
+        startActivity(new Intent(this,SelectFileActivity.class));
         finish();
 
     }

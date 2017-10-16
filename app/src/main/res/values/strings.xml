@@ -1,9 +1,15 @@
 <resources>
     <string name="app_name">FloatingActionButton</string>
-    <string name="Slide_1_title">Benvenuto su Myapp</string>
-    <string name="Slide_2_title">Applicando qui le tue modifiche, automaticamente verranno sincronizzate sul cloud </string>
-    <string name="Slide_4_desc">Per cominciare clicca sul menù in alto a destra e scegli a quale cloud storage connetterti</string>
+    <string name="slide1_desc">MyApp è un applicazione che ti permette di creare, modificare e visualizzare il contenuto di un file .json presente sul tuo dispositivo </string>
+    <string name="Slide_2_title">Puoi creare, rinominare ed eliminare cartelle e file </string>
+    <string name="slide_3_desc">Vedrai istantaneamente le tue modifiche e contemporaneamente queste verranno scritte sul file .json </string>
     <string name="my_preference">"com.giulia.com.MyPref</string>
     <string name="my_preference_key">"com.giulia.com.MyPrefKey"</string>
-    <string name="slide1_desc">MyApp ti permette di visualizzare e modificare la struttura delle cartelle e dei file del tuo cloud storage preferito </string>
+    <string name="chooser_title">Lorem ipsum</string>
+    <string name="choose_file">Select a file</string>
+    <string name="internal_storage">Internal storage</string>
+    <string name="empty_directory">Empty Directory</string>
+    <string name="storage_removed">Storage was removed or unmounted.</string>
+    <string name="error_selecting_file">Error selecting File</string>
+
 </resources>

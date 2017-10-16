@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:src="@drawable/cloudcomputing"
+        android:src="@drawable/diagram1"
         android:scaleType="centerCrop"
         android:id="@+id/img1"
         android:layout_alignParentTop="true"
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tv1Slide1"
-        android:text="SINCRONIZZAZIONE"
+        android:text="MODIFICA"
         android:textColor="@android:color/white"
         android:gravity="center"
         android:textStyle="bold"
@@ -28,11 +28,9 @@
         android:layout_marginTop="17dp"
         android:layout_centerHorizontal="true" />
     <TextView
-        android:layout_width="250dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:text="Applicando qui le tue modifiche,
-esse verranno automaticamente
-sincronizzate sul cloud"
+        android:text="@string/Slide_2_title"
         android:textSize="18sp"
         android:id="@+id/tv2Slide2"
         android:textColor="#ffffff"

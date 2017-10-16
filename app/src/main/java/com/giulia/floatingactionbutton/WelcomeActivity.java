@@ -61,15 +61,16 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onPageSelected(int position) {
                 createDots(position);
-             /*   if(position==layouts.length-1)
+                if(position==layouts.length-1)
                 {
-                    //skip.setVisibility(View.INVISIBLE);
+                    next.setText("START");
+                    skip.setVisibility(View.INVISIBLE);
                 }
                 else
                 {
-                    next.setText("NEXT");
+
                     skip.setVisibility(View.VISIBLE);
-                }*/
+                }
 
 
 
@@ -146,8 +147,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             mPager.setCurrentItem(nextSlide);
         }
         else
-        {
-            loadHome();
+        {   loadHome();
             new PreferenceManager(this).writePreference();
         }
 

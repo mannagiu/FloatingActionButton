@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ef10c6"
+    >
+<ImageView
+    android:layout_width="100dp"
+    android:layout_height="100dp"
+    android:src="@drawable/newdocument"
+    android:id="@+id/imageView5"
+    android:layout_marginTop="63dp"
+    android:layout_alignParentTop="true"
+    android:layout_alignStart="@+id/button"
+    android:layout_marginStart="17dp" />
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CREA UN NUOVO FILE"
+        android:textColor="@color/activeDots"
+        android:background="@android:color/transparent"
+        android:layout_below="@+id/imageView5"
+        android:layout_toStartOf="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="oppure"
+        android:textSize="25sp"
+        android:id="@+id/textView2"
+        android:textColor="@color/activeDots"
+        android:layout_below="@+id/button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="11dp" />
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/archivio"
+        android:layout_above="@+id/button2"
+        android:layout_toEndOf="@+id/textView2" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:textColor="@color/activeDots"
+        android:text="SELEZIONA UN FILE ESISTENTE"
+        android:id="@+id/button2"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="63dp" />
+
+</RelativeLayout>
